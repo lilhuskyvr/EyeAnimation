@@ -1,0 +1,15 @@
+﻿{
+  "$type": "ThunderRoad.LevelData, Assembly-CSharp",
+  "id": "Master",
+  "version": 2,
+  "modes": [
+    {
+      "name": "Default",
+      "modules": [
+        {
+          "$type": "EyeAnimation.EyeAnimationLevelModule, EyeAnimation"
+        }
+      ]
+    }
+  ]
+}
