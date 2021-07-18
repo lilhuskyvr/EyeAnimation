@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using ThunderRoad;
 using UnityEngine;
@@ -9,19 +8,53 @@ namespace EyeAnimation
     public class EyeAnimation : MonoBehaviour
     {
         private Creature _creature;
+        private float _closedUpperLid;
+        private float _closedLowerLid;
+        public Transform leftUpperLid;
+        public Transform rightUpperLid;
+        public Transform leftLowerLid;
+        public Transform rightLowerLid;
 
         private void Awake()
         {
             _creature = GetComponent<Creature>();
+            _closedUpperLid = _creature.data.gender == CreatureData.Gender.Male ? -55 : -25;
+            _closedLowerLid = _creature.data.gender == CreatureData.Gender.Male ? 20 : 5;
+
+            leftUpperLid =
+                _creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
+                    boneCondition.Value.name == "LeftUpperLid_Mesh").Value;
+            rightUpperLid =
+                _creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
+                    boneCondition.Value.name == "RightUpperLid_Mesh").Value;
+            leftLowerLid =
+                _creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
+                    boneCondition.Value.name == "LeftLowerLid_Mesh").Value;
+            rightLowerLid =
+                _creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
+                    boneCondition.Value.name == "RightLowerLid_Mesh").Value;
             _creature.OnKillEvent += CreatureOnOnKillEvent;
+            // _creature.OnDamageEvent += CreatureOnOnDamageEvent;
+            // _creature.ragdoll.OnStateChange += RagdollOnOnStateChange;
+        }
+
+        private void RagdollOnOnStateChange(Ragdoll.State state)
+        {
+            Debug.Log("Is state" + (state == Ragdoll.State.Destabilized));
+        }
+
+        private void CreatureOnOnDamageEvent(CollisionInstance collisioninstance)
+        {
+            _creature.Kill();
+            if (_creature.state == Creature.State.Alive)
+                StartCoroutine(FlashingEyes());
         }
 
         private void CreatureOnOnKillEvent(CollisionInstance collisioninstance, EventTime eventtime)
         {
             if (eventtime == EventTime.OnEnd)
             {
-                Debug.Log("creature killed");
-                StartCoroutine(ClosingEyes(_creature));
+                StartCoroutine(ClosingEyes());
             }
         }
 
@@ -41,54 +74,48 @@ namespace EyeAnimation
             yield return null;
         }
 
-        private IEnumerator ClosingEyes(Creature creature, float duration = 2)
+        private IEnumerator AnimateLocalRotationBackAndForth(Transform animatedTransform, float duration,
+            Quaternion targetLocalRotation)
         {
-            var upperLidClosed = creature.data.gender == CreatureData.Gender.Male ? -55 : -25;
-            var lowerLidClosed = creature.data.gender == CreatureData.Gender.Male ? 20 : 5;
-            var leftUpperLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "LeftUpperLid_Mesh");
-            var rightUpperLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "RightUpperLid_Mesh");
-            var leftLowerLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "LeftLowerLid_Mesh");
-            var rightLowerLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "RightLowerLid_Mesh");
+            var startLocalRotation = animatedTransform.localRotation;
+            var startTime = Time.time;
 
-            StartCoroutine(AnimateLocalRotation(leftUpperLid.Value, duration,
-                Quaternion.Euler(0, upperLidClosed, 0)));
-            StartCoroutine(AnimateLocalRotation(rightUpperLid.Value, duration,
-                Quaternion.Euler(0, upperLidClosed, 0)));
-            StartCoroutine(AnimateLocalRotation(leftLowerLid.Value, duration,
-                Quaternion.Euler(0, lowerLidClosed, 0)));
-            StartCoroutine(AnimateLocalRotation(rightLowerLid.Value, duration,
-                Quaternion.Euler(0, lowerLidClosed, 0)));
+            var halfDuration = duration / 2;
+            while (Time.time - startTime < halfDuration)
+            {
+                animatedTransform.localRotation = Quaternion.Lerp(startLocalRotation, targetLocalRotation,
+                    (Time.time - startTime) / halfDuration);
+                yield return new WaitForFixedUpdate();
+            }
+
+            startTime = Time.time;
+
+            while (Time.time - startTime < halfDuration)
+            {
+                animatedTransform.localRotation = Quaternion.Lerp(targetLocalRotation, startLocalRotation,
+                    (Time.time - startTime) / halfDuration);
+                yield return new WaitForFixedUpdate();
+            }
 
             yield return null;
         }
 
-        private IEnumerator OpeningEyes(Creature creature)
+        public IEnumerator ClosingEyes(float duration = 2)
         {
-            var leftUpperLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "LeftUpperLid_Mesh");
-            var rightUpperLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "RightUpperLid_Mesh");
-            var leftLowerLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "LeftLowerLid_Mesh");
-            var rightLowerLid =
-                creature.manikinParts.Rig.bones.FirstOrDefault(boneCondition =>
-                    boneCondition.Value.name == "RightLowerLid_Mesh");
+            StartCoroutine(AnimateLocalRotation(leftUpperLid, duration, Quaternion.Euler(0, _closedUpperLid, 0)));
+            StartCoroutine(AnimateLocalRotation(rightUpperLid, duration, Quaternion.Euler(0, _closedUpperLid, 0)));
+            StartCoroutine(AnimateLocalRotation(leftLowerLid, duration, Quaternion.Euler(0, _closedLowerLid, 0)));
+            StartCoroutine(AnimateLocalRotation(rightLowerLid, duration, Quaternion.Euler(0, _closedLowerLid, 0)));
 
-            StartCoroutine(AnimateLocalRotation(leftUpperLid.Value, 5, Quaternion.Euler(0, 0, 0)));
-            StartCoroutine(AnimateLocalRotation(rightUpperLid.Value, 5, Quaternion.Euler(0, 0, 0)));
-            StartCoroutine(AnimateLocalRotation(leftLowerLid.Value, 5, Quaternion.Euler(0, 0, 0)));
-            StartCoroutine(AnimateLocalRotation(rightLowerLid.Value, 5, Quaternion.Euler(0, 0, 0)));
+            yield return null;
+        }
+
+        public IEnumerator FlashingEyes(float duration = 0.5f)
+        {
+            StartCoroutine(AnimateLocalRotationBackAndForth(leftUpperLid, 5, Quaternion.Euler(0, 0, 0)));
+            StartCoroutine(AnimateLocalRotationBackAndForth(rightUpperLid, 5, Quaternion.Euler(0, 0, 0)));
+            StartCoroutine(AnimateLocalRotationBackAndForth(leftLowerLid, 5, Quaternion.Euler(0, 0, 0)));
+            StartCoroutine(AnimateLocalRotationBackAndForth(rightLowerLid, 5, Quaternion.Euler(0, 0, 0)));
 
             yield return null;
         }
@@ -96,6 +123,8 @@ namespace EyeAnimation
         private void OnDestroy()
         {
             _creature.OnKillEvent -= CreatureOnOnKillEvent;
+            // _creature.OnDamageEvent -= CreatureOnOnDamageEvent;
+            // _creature.ragdoll.OnStateChange -= RagdollOnOnStateChange;
         }
     }
 }
