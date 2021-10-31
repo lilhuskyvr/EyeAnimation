@@ -62,11 +62,11 @@ namespace EyeAnimation
                     {
                         if (bone.name.Contains("UpperLid"))
                         {
-                            StartCoroutine(AnimateLocalRotation(bone, 5, Quaternion.Euler(0, _closedUpperLid, 0)));
+                            StartCoroutine(AnimateLocalRotation(bone, 15, Quaternion.Euler(0, _closedUpperLid, 0)));
                         }
                         if (bone.name.Contains("LowerLid"))
                         {
-                            StartCoroutine(AnimateLocalRotation(bone, 5, Quaternion.Euler(0, _closedLowerLid, 0)));
+                            StartCoroutine(AnimateLocalRotation(bone, 15, Quaternion.Euler(0, _closedLowerLid, 0)));
                         }
                     }
                 }
@@ -97,7 +97,7 @@ namespace EyeAnimation
             yield return null;
         }
 
-        public IEnumerator ClosingEyes(float duration = 2)
+        public IEnumerator ClosingEyes(float duration = 3)
         {
             StartCoroutine(AnimateLocalRotation(leftUpperLid, duration, Quaternion.Euler(0, _closedUpperLid, 0)));
             StartCoroutine(AnimateLocalRotation(rightUpperLid, duration, Quaternion.Euler(0, _closedUpperLid, 0)));
