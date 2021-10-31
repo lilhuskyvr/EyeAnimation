@@ -105,3 +105,6 @@ D:\Steam\steamapps\common\Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\M
 D:\Steam\steamapps\common\Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\Mods\EyeAnimation\manifest.json
 D:\Steam\steamapps\common\Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\Mods\EyeAnimation\EyeAnimation.dll
 D:\Steam\steamapps\common\Blade & Sorcery\BladeAndSorcery_Data\StreamingAssets\Mods\EyeAnimation\EyeAnimation.pdb
+D:\Projects\RiderProjects\EyeAnimation\EyeAnimation\obj\Release\EyeAnimation.csprojResolveAssemblyReference.cache
+D:\Projects\RiderProjects\EyeAnimation\EyeAnimation\obj\Release\EyeAnimation.dll
+D:\Projects\RiderProjects\EyeAnimation\EyeAnimation\obj\Release\EyeAnimation.pdb
