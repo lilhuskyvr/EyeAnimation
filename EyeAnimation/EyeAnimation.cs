@@ -62,11 +62,11 @@ namespace EyeAnimation
                     {
                         if (bone.name.Contains("UpperLid"))
                         {
-                            StartCoroutine(AnimateLocalRotation(bone, 15, Quaternion.Euler(0, _closedUpperLid, 0)));
+                            StartCoroutine(AnimateLocalRotation(bone, 5, Quaternion.Euler(0, _closedUpperLid, 0)));
                         }
                         if (bone.name.Contains("LowerLid"))
                         {
-                            StartCoroutine(AnimateLocalRotation(bone, 15, Quaternion.Euler(0, _closedLowerLid, 0)));
+                            StartCoroutine(AnimateLocalRotation(bone, 5, Quaternion.Euler(0, _closedLowerLid, 0)));
                         }
                     }
                 }
