@@ -51,7 +51,6 @@ namespace EyeAnimation
 
         private void DismembermentOnCompleted(object sender, Dismemberment.CompletedEventArgs e)
         {
-            Debug.Log("completed");
             var severedMesh = e.splitGameObject;
 
             foreach (var skinnedMeshRenderer in severedMesh.GetComponentsInChildren<SkinnedMeshRenderer>())
